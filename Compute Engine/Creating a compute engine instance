@@ -21,7 +21,7 @@ gcloud compute instances create $INSTANCE_NAME \
         --metadata="install-nvidia-driver=True"
         
 
-3) Check the instances avaialbe and their IP
+3) Check the instances availabe and their IP
       gcloud compute instances list
       
 4) Check the instance state

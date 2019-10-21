@@ -6,39 +6,43 @@
     --scopes "userinfo-email,cloud-platform" \
     --metadata BUCKET=demo-01 \
     --zone us-east1-b \
-    --tags http-server
-    --allow tcp:80     // this is default default firewall rules "default-allow-http" and "default-allow-https" to allow traffic on port 80 and 443.
+    --tags default-allow-http 
     // Optional script -- refer below section : Create a startup script
     --metadata-from-file startup-script=instance-startup.sh \
 
 2) Create firewall rule
-    gcloud compute firewall-rules create default-allow-http-8080 \
-        --allow tcp:8080 \
+    gcloud compute firewall-rules create default-allow-http \
+        --allow tcp:80 \
         --source-ranges 0.0.0.0/0 \
         --target-tags http-server \
-        --description "Allow port 8080 access to http-server"
+        --description "Allow port 80 access to http-server"
+        
+// this is default default firewall rules "default-allow-http" and "default-allow-https" to allow traffic on port 80 and 443.
+  
+3) SSH 
+    gcloud compute ssh demo-instance --zone us-east1-b
 
-3) Install dependencies
+4) Install dependencies
     apt-get update
 
-4) Install Java 
-    apt install openjdk-8-jdk openjdk-8-jre
+5) Install Java 
+    sudo apt install openjdk-8-jdk openjdk-8-jre
 
-5) Verify Java version
+6) Verify Java version
     java -version
     
-6) Set ENV Variables
+7) Set ENV Variables
     echo JAVA_HOME= /usr/lib/jvm/java-8-openjdk-amd64
     echo JRE_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 
-7) Install git
-    apt install git
+8) Install git
+    sudo apt install git
     
-8) Clone sample spring boot hellow world app
+9) Clone sample spring boot hellow world app
     git clone https://github.com/gurulnd-git/gae-standard-example.git
     cd gae-standard-example
     
-9) Run local build
+10) Run local build
     ./mvnw -DskipTests spring-boot:run
     
     

@@ -3,19 +3,19 @@
     --image-family debian-9 \
     --image-project debian-cloud \
     --machine-type g1-small \
-    --scopes "userinfo-email,cloud-platform" \
-    --metadata BUCKET=demo-01 \
     --zone us-east1-b \
-    --tags default-allow-http 
+    --tags http-server \
+    --metadata BUCKET=demo-01 \
+    --scopes "userinfo-email,cloud-platform" 
     // Optional script -- refer below section : Create a startup script
     --metadata-from-file startup-script=instance-startup.sh \
 
 2) Create firewall rule
-    gcloud compute firewall-rules create default-allow-http \
-        --allow tcp:80 \
+    gcloud compute firewall-rules create default-allow-http-8080 \
+        --allow tcp:8080 \
         --source-ranges 0.0.0.0/0 \
         --target-tags http-server \
-        --description "Allow port 80 access to http-server"
+        --description "Allow port 8080 access to http-server"
         
 // this is default default firewall rules "default-allow-http" and "default-allow-https" to allow traffic on port 80 and 443.
   
@@ -23,7 +23,7 @@
     gcloud compute ssh demo-instance --zone us-east1-b
 
 4) Install dependencies
-    apt-get update
+    sudo apt-get update
 
 5) Install Java 
     sudo apt install openjdk-8-jdk openjdk-8-jre

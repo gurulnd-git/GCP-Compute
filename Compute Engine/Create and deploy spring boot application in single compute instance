@@ -1,0 +1,76 @@
+1) Create instance
+    gcloud compute instances create demo-instance \
+    --image-family debian-9 \
+    --image-project debian-cloud \
+    --machine-type g1-small \
+    --scopes "userinfo-email,cloud-platform" \
+    --metadata BUCKET=demo-01 \
+    --zone us-east1-b \
+    --tags http-server
+    --allow tcp:80     // this is default default firewall rules "default-allow-http" and "default-allow-https" to allow traffic on port 80 and 443.
+    // Optional script -- refer below section : Create a startup script
+    --metadata-from-file startup-script=instance-startup.sh \
+
+2) Create firewall rule
+    gcloud compute firewall-rules create default-allow-http-8080 \
+        --allow tcp:8080 \
+        --source-ranges 0.0.0.0/0 \
+        --target-tags http-server \
+        --description "Allow port 8080 access to http-server"
+
+3) Install dependencies
+    apt-get update
+
+4) Install Java 
+    apt install openjdk-8-jdk openjdk-8-jre
+
+5) Verify Java version
+    java -version
+    
+6) Set ENV Variables
+    echo JAVA_HOME= /usr/lib/jvm/java-8-openjdk-amd64
+    echo JRE_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
+
+7) Install git
+    apt install git
+    
+8) Clone sample spring boot hellow world app
+    git clone https://github.com/gurulnd-git/gae-standard-example.git
+    cd gae-standard-example
+    
+9) Run local build
+    ./mvnw -DskipTests spring-boot:run
+    
+    
+    Note: Now check the external IP address to this instance by using CLI with `gcloud compute instances list` or browse in gconsole. 
+          If not able to access,check allow http access by editing the instance if not.
+          
+          
+// Before using start up script - Upload a prod jar to cloud storage after building or using CI/CD
+    gsutil cp build/libs/* gs://demo-01/demo.jar
+    
+    
+------------------------------------------------------------------------------------------------------------------------------- 
+ // Create a startup script
+
+#!/bin/sh
+
+# Set the metadata server to the get projct id
+PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
+BUCKET=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/attributes/BUCKET" -H "Metadata-Flavor: Google")
+
+echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
+
+# Get the files we need
+gsutil cp gs://${BUCKET}/demo.jar .
+
+# Install dependencies
+apt-get update
+apt-get -y --force-yes install openjdk-8-jdk
+
+# Make Java 8 default
+update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+
+# Start server
+java -jar demo.jar
+

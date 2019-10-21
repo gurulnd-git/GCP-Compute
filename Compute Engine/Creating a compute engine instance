@@ -25,7 +25,7 @@ gcloud compute instances create $INSTANCE_NAME \
       gcloud compute instances list
       
 4) Check the instance state
-      gcloud compute instances describe $INSTANCE_NAME
+      gcloud compute instances describe $INSTANCE_NAME --zone=$ZONE
       
 5) Login to created VM instance 
       gcloud compute ssh $INSTANCE_NAME
